@@ -91,6 +91,7 @@
    - On **Windows**, run `OpCore-Simplify.bat`.
    - On **macOS**, run `OpCore-Simplify.command`.
    - On **Linux**, run `OpCore-Simplify.py` with existing Python interpreter.
+   - On consoles without Unicode support (e.g. stock `cmd.exe` with codepage `cp1252`), section titles automatically degrade from box-drawing to ASCII borders instead of crashing.
 
    ![OpCore Simplify Menu](https://i.imgur.com/vTr1V9D.png)
 
