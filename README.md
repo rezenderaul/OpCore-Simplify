@@ -5,7 +5,7 @@
 > | Field | Value |
 > |---|---|
 > | Upstream baseline | `e5d8a9f551b1e2a96e2f968696b460b65a7dad2e` (2026-08-27, `Arrow Lake and macOS Tahoe 26`) |
-> | Fork snapshot | `usable-2026-10-02` (pending first tag) |
+> | Fork snapshot | `usable-2026-10-02` |
 > | Windows run | See [Fork Windows notes](#-fork-windows-notes) below; `main` stays a clean mirror, daily fixes land here first as small PRs upstream. |
 >
 <div align="center">
