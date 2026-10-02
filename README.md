@@ -144,6 +144,21 @@
 > 
 > 2. For AMD GPUs, after applying root patches from OpenCore Legacy Patcher, you need to remove the boot argument `-radvesa`/`-amd_no_dgpu_accel` for graphics acceleration to work.
 
+## 🛠️ **Fork Windows notes** (`usable-windows`)
+
+Tested interpreter: `Python 3.14.7` (`%LOCALAPPDATA%\Programs\Python\Python314\python.exe`).
+
+1. **Prerequisites (verified commands):**
+   ```bat
+   python --version
+   python -m pip install certifi
+   ```
+   Background: stock Windows Python ships with `openssl_cafile` pointing at `C:\Program Files\Common Files\SSL\cert.pem` (absent) and no `certifi`, so `Scripts/resource_fetcher.py` falls back to an unverified context with `Failed to create SSL context: No module named 'certifi'`.
+
+2. **Skip the broken auto-update:** when prompted `Do you want to skip the update process? (yes/No):`, answer `yes`. The updater scrapes `github.com/.../commits/main` HTML and currently fails even with good network (`Cannot find commit information for repository OpCore-Simplify on branch main`, `sha_version.txt` becomes `update_forced_by_user`).
+
+3. **Manual `iasl.exe` (required on Windows):** `Scripts/` ships only a Linux `iasl` ELF; `win32` needs `iasl.exe` next to `dsdt.py`. Download release `20260930` from `https://github.com/open-acpica/acpica/releases` (note: `acpica/acpica` redirects to `open-acpica/acpica`; the old `iasl-win-YYYYMMDD.zip` name no longer exists — current asset is a bare `iasl` binary) and place the Windows `iasl.exe` at `Scripts\iasl.exe`. Then re-run `OpCore-Simplify.bat` and choose `E. Export hardware report`.
+
 ## 🤝 **Contributing**
 
 Contributions are **highly appreciated**! If you have ideas to improve this project, feel free to fork the repo and create a pull request, or open an issue with the "enhancement" tag.
