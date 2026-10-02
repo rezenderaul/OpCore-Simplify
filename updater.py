@@ -6,14 +6,35 @@ import os
 import tempfile
 import shutil
 
+UPSTREAM_OWNER = "lzhoang2801"
+UPSTREAM_REPO = "OpCore-Simplify"
+UPSTREAM_BRANCH = "main"
+
+# Fork update source (this file ships on usable-windows).
+UPDATE_OWNER = "rezenderaul"
+UPDATE_REPO = "OpCore-Simplify"
+UPDATE_BRANCH = "usable-windows"
+
+
+def archive_url(owner=UPSTREAM_OWNER, repo=UPSTREAM_REPO, branch=UPSTREAM_BRANCH):
+    return "https://github.com/{}/{}/archive/refs/heads/{}.zip".format(owner, repo, branch)
+
+
+def extracted_dir_name(repo=UPSTREAM_REPO, branch=UPSTREAM_BRANCH):
+    return "{}-{}".format(repo, branch)
+
+
 class Updater:
-    def __init__(self):
+    def __init__(self, owner=None, repo=None, branch=None):
+        self.update_owner = owner or UPDATE_OWNER
+        self.update_repo = repo or UPDATE_REPO
+        self.update_branch = branch or UPDATE_BRANCH
         self.github = github.Github()
         self.fetcher = resource_fetcher.ResourceFetcher()
         self.run = run.Run().run
         self.utils = utils.Utils()
         self.sha_version = os.path.join(os.path.dirname(os.path.realpath(__file__)), "sha_version.txt")
-        self.download_repo_url = "https://github.com/lzhoang2801/OpCore-Simplify/archive/refs/heads/main.zip"
+        self.download_repo_url = archive_url(self.update_owner, self.update_repo, self.update_branch)
         self.temporary_dir = tempfile.mkdtemp()
         self.current_step = 0
 
@@ -31,14 +52,14 @@ class Updater:
             print("Error reading current SHA version: {}".format(str(e)))
             return "error_reading_sha_version"
 
-    def get_latest_sha_version(self):
+    def get_latest_sha_version(self, owner=UPSTREAM_OWNER, repo=UPSTREAM_REPO, branch=UPSTREAM_BRANCH):
         print("Fetching latest version from GitHub...")
         try:
-            commits = self.github.get_commits("lzhoang2801", "OpCore-Simplify")
+            commits = self.github.get_commits(owner, repo, branch)
             return commits["commitGroups"][0]["commits"][0]["oid"]
         except Exception as e:
             print("Error fetching latest SHA version: {}".format(str(e)))
-        
+
         return None
 
     def download_update(self):
@@ -70,15 +91,23 @@ class Updater:
             print("  Error during download/extraction: {}".format(str(e)))
             return False
 
+    def _find_target_dir(self):
+        extracted = extracted_dir_name(self.update_repo, self.update_branch)
+        candidates = [
+            os.path.join(self.temporary_dir, extracted),
+            os.path.join(self.temporary_dir, "main", extracted),
+            os.path.join(self.temporary_dir, "OpCore-Simplify-main"),
+            os.path.join(self.temporary_dir, "main", "OpCore-Simplify-main"),
+        ]
+        return next((c for c in candidates if os.path.exists(c)), None)
+
     def update_files(self):
         self.current_step += 1
         print("Step {}: Updating files...".format(self.current_step))
         try:
-            target_dir = os.path.join(self.temporary_dir, "OpCore-Simplify-main")
-            if not os.path.exists(target_dir):
-                target_dir = os.path.join(self.temporary_dir, "main", "OpCore-Simplify-main")
-                
-            if not os.path.exists(target_dir):
+            target_dir = self._find_target_dir()
+
+            if not target_dir:
                 print("  Could not locate extracted files directory")
                 return False
                 
@@ -135,7 +164,9 @@ class Updater:
         print("")
         
         current_sha_version = self.get_current_sha_version()
-        latest_sha_version = self.get_latest_sha_version()
+        latest_sha_version = self.get_latest_sha_version(
+            self.update_owner, self.update_repo, self.update_branch
+        )
         
         print("")
 
