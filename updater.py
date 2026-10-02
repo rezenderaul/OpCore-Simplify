@@ -93,8 +93,12 @@ class Updater:
 
     def _find_target_dir(self):
         extracted = extracted_dir_name(self.update_repo, self.update_branch)
+        # extract_zip_file unpacks into <zip-stem>/ (zip stem "main" gives
+        # the historical "main/" nesting, "usable-windows" likewise).
+        zip_stem = os.path.splitext(os.path.basename(self.download_repo_url))[0]
         candidates = [
             os.path.join(self.temporary_dir, extracted),
+            os.path.join(self.temporary_dir, zip_stem, extracted),
             os.path.join(self.temporary_dir, "main", extracted),
             os.path.join(self.temporary_dir, "OpCore-Simplify-main"),
             os.path.join(self.temporary_dir, "main", "OpCore-Simplify-main"),

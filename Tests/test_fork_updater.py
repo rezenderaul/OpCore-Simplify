@@ -62,6 +62,16 @@ class TargetDirTest(unittest.TestCase):
             os.makedirs(want)
             self.assertEqual(up._find_target_dir(), want)
 
+    def test_zip_stem_nesting_resolves(self):
+        # extract_zip_file unpacks usable-windows.zip into
+        # usable-windows/OpCore-Simplify-usable-windows.
+        up = fresh_updater(self)
+        with tempfile.TemporaryDirectory() as tmp:
+            up.temporary_dir = tmp
+            want = os.path.join(tmp, "usable-windows", "OpCore-Simplify-usable-windows")
+            os.makedirs(want)
+            self.assertEqual(up._find_target_dir(), want)
+
     def test_missing_layout_returns_none(self):
         up = fresh_updater(self)
         with tempfile.TemporaryDirectory() as tmp:
