@@ -163,6 +163,12 @@ Tested interpreter: `Python 3.14.7` (`%LOCALAPPDATA%\Programs\Python\Python314\p
 
 3. **Manual `iasl.exe` (required on Windows):** `Scripts/` ships only a Linux `iasl` ELF; `win32` needs `iasl.exe` next to `dsdt.py`. Download release `20260930` from `https://github.com/open-acpica/acpica/releases` (note: `acpica/acpica` redirects to `open-acpica/acpica`; the old `iasl-win-YYYYMMDD.zip` name no longer exists — current asset is a bare `iasl` binary) and place the Windows `iasl.exe` at `Scripts\iasl.exe`. Then re-run `OpCore-Simplify.bat` and choose `E. Export hardware report`.
 
+4. **Console encoding (interim workaround):** stock `cmd.exe` (`cp1252`) crashes the old code at the first title with `UnicodeEncodeError`. Until the ASCII-fallback fix ships, run with:
+   ```bat
+   set PYTHONIOENCODING=utf-8&& python OpCore-Simplify.py
+   ```
+   No space before `&&` — `set VAR=1 && ...` bakes a trailing space into the value and Python rejects it.
+
 ## 🤝 **Contributing**
 
 Contributions are **highly appreciated**! If you have ideas to improve this project, feel free to fork the repo and create a pull request, or open an issue with the "enhancement" tag.
