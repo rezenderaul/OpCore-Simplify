@@ -55,6 +55,44 @@ class Github:
 
         return holder
 
+    def get_release_tags(self, owner, repo):
+        url = "https://github.com/{}/{}/releases".format(owner, repo)
+        response = self.fetcher.fetch_and_parse_content(url)
+
+        if not response:
+            return []
+
+        tags = []
+        for line in response.splitlines():
+            if "<a" in line and "href=\"" in line and "/releases/tag/" in line:
+                tag = line.split("/releases/tag/")[1].split("\"")[0]
+                if tag not in tags:
+                    tags.append(tag)
+        return tags
+
+    def get_release_by_tag(self, owner, repo, tag_name):
+        tag_url = "https://github.com/{}/{}/releases/tag/{}".format(owner, repo, tag_name)
+        response = self.fetcher.fetch_and_parse_content(tag_url)
+
+        if not response:
+            raise ValueError("Failed to fetch release information from GitHub.")
+
+        body = self._extract_body_content(response)
+
+        release_tag_url = "https://github.com/{}/{}/releases/expanded_assets/{}".format(owner, repo, tag_name)
+        response = self.fetcher.fetch_and_parse_content(release_tag_url)
+
+        if not response:
+            raise ValueError("Failed to fetch expanded assets information from GitHub.")
+
+        assets = self._extract_assets(response)
+
+        return {
+            "tag": tag_name,
+            "body": body,
+            "assets": assets
+        }
+
     def get_latest_release(self, owner, repo):
         url = "https://github.com/{}/{}/releases".format(owner, repo)
         response = self.fetcher.fetch_and_parse_content(url)
