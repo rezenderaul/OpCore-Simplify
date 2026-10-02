@@ -170,6 +170,8 @@ Tested interpreter: `Python 3.14.7` (`%LOCALAPPDATA%\Programs\Python\Python314\p
    ```
    No space before `&&` — `set VAR=1 && ...` bakes a trailing space into the value and Python rejects it.
 
+5. **One-time migration (stale checkouts):** if your copy ever self-updated from upstream (fixes seemingly vanished), delete `sha_version.txt` and run once answering `yes` at the skip prompt. From this build on, the updater tracks the **fork** (`usable-windows` tip), so self-updates preserve fork files.
+
 ## 🤝 **Contributing**
 
 Contributions are **highly appreciated**! If you have ideas to improve this project, feel free to fork the repo and create a pull request, or open an issue with the "enhancement" tag.
